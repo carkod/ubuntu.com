@@ -5,6 +5,7 @@ from math import ceil
 
 # Packages
 import flask
+import re
 from feedgen.entry import FeedEntry
 from feedgen.feed import FeedGenerator
 from marshmallow import EXCLUDE
@@ -267,8 +268,7 @@ def create_notice():
 
 # CVE views
 # ===
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 def cve_index():
 
     # Temporary fix for data to be displayed
@@ -277,25 +277,10 @@ def cve_index():
 
 
 def cve(cve_id):
-
-    # Temporary fix for data to be displayed
-    cve = db_session.query(CVE).get(cve_id.upper())
-    if not cve:
-=======
-def cve(cve_id):
     match_cves = re.compile(r"cve-\d{4}-\d{4,7}")
     if cve_id == "cve":
         return flask.render_template("security/cve/index.html")
     elif match_cves.search(cve_id) is not None:
         return flask.render_template("security/cve/cve.html")
     else:
->>>>>>> Add page for cve release
         flask.abort(404)
-=======
-def cve_index():
-    return flask.render_template("security/cve/index.html")
-
-
-def cve(cve_id):
-    return flask.render_template("security/cve/cve.html")
->>>>>>> Handle cve routes
