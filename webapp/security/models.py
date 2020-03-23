@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 from datetime import datetime
 
-=======
->>>>>>> All data
 from sqlalchemy import (
     Boolean,
     Column,
@@ -20,11 +17,6 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
-<<<<<<< HEAD
-# Enums
-
-=======
->>>>>>> All data
 notice_cves = Table(
     "notice_cves",
     Base.metadata,
