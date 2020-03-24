@@ -268,3 +268,10 @@ def cve_index():
 
 def cve(cve_id):
     return flask.render_template("security/cve/cve.html")
+
+
+# CVE api
+# ===
+
+def api_create_cve():
+    print(flask.request)
