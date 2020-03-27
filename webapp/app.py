@@ -53,6 +53,9 @@ from webapp.security.views import (
     notices_feed,
     cve_index,
     cve,
+    create_cve,
+    delete_cve,
+    update_cve,
 )
 
 

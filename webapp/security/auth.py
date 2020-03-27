@@ -6,7 +6,6 @@ import flask
 from launchpadlib.launchpad import Launchpad
 from macaroonbakery import bakery, checkers, httpbakery
 
-
 AUTHORIZED_TEAMS = ["canonical-security", "canonical-webmonkeys"]
 IDENTITY_CAVEATS = [
     checkers.need_declared_caveat(
