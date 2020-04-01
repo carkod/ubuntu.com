@@ -270,9 +270,66 @@ def create_notice():
 
 def cve_index():
 
-    # Temporary fix for data to be displayed
-    list_cve = db_session.query(CVE).limit(10)
-    return flask.render_template("security/cve/index.html", list_cve=list_cve)
+    # Query parameters
+    order_by = flask.request.args.get("order_by", default="oldest", type=str)
+    search_desc = flask.request.args.get("search_desc", default="", type=str)
+    priority = flask.request.args.get("priority", default="", type=str)
+    limit = flask.request.args.get("limit", default=20, type=int)
+    offset = flask.request.args.get("offset", default=0, type=int)
+
+    # Basic queries
+    cves_query = db_session.query(CVE)
+    releases_query = db_session.query(Release)
+
+    # Search functionality
+    if search_desc and priority:
+        cves_query = cves_query.filter(
+                CVE.description.ilike(f"%{search_desc}%"),
+            )
+    elif priority:
+        cves_query = cves_query.filter(CVE.priority == priority,)
+    elif search_desc:
+        cves_query = cves_query.filter(
+            CVE.description.ilike(f"%{search_desc}%"),
+        )
+
+    sort = asc if order_by == "oldest" else desc
+
+    list_cve = (
+        cves_query.order_by(sort(CVE.public_date))
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+
+    # Pagination
+    total_results = cves_query.count()
+    total_pages = ceil(total_results / limit)
+    page_first_result = offset + 1
+    page_last_result = offset + len(list_cve)
+
+    if offset > total_results:
+        list_cve = []
+        total_pages = None
+        total_results = None
+        page_first_result = None
+        page_last_result = None
+
+    pagination = (
+        dict(
+            total_pages=total_pages,
+            total_results=total_results,
+            page_first_result=page_first_result,
+            page_last_result=page_last_result
+        ),
+    )
+
+    return flask.render_template(
+        "security/cve/index.html",
+        releases=releases_query.all(),
+        list_cve=list_cve,
+        pagination=pagination,
+    )
 
 
 def cve(cve_id):
