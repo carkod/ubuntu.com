@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 from datetime import datetime
 
-=======
->>>>>>> Pagination, sorting and basic search. Model updates
 from sqlalchemy import (
     Boolean,
     Column,
@@ -115,7 +112,6 @@ class Release(Base):
     version = Column(String, unique=True)
     codename = Column(String, unique=True)
     lts = Column(Boolean)
-<<<<<<< HEAD
     development = Column(Boolean)
     release_date = Column(DateTime)
     esm_expires = Column(DateTime)
@@ -130,10 +126,6 @@ class Release(Base):
         elif self.lts and self.esm_expires > now:
             return "ESM"
         return ""
-=======
-    esm = Column(Boolean)
-    development = Column(Boolean)
-    component = Column(String)
 
 
 class CVEReference(Base):
@@ -148,4 +140,3 @@ class Bug(Base):
 
     id = Column(Integer, primary_key=True)
     uri = Column(String)
->>>>>>> Pagination, sorting and basic search. Model updates
