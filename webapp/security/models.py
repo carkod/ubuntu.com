@@ -92,10 +92,7 @@ package_release_status = Table(
     "package_release_status",
     Base.metadata,
     Column("package_id", Integer, ForeignKey("package.id")),
-    Column("release_id", Integer, ForeignKey("release.id")),
-    Column("status", Enum(PackageStatus)),
-    Column("status_description", Enum(PackageStatus)),
-    extend_existing=True,
+    Column("release_id", Integer, ForeignKey("cve_release.id")),
 )
 
 
@@ -168,4 +165,31 @@ class Release(Base):
         elif self.lts and self.esm_expires > now:
             return "ESM"
 
+<<<<<<< HEAD
         return ""
+=======
+
+class Bug(Base):
+    __tablename__ = "bug"
+
+    id = Column(Integer, primary_key=True)
+    uri = Column(String)
+
+
+class Package(Base):
+    __tablename__ = "package"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True)
+    type = Column(Enum(PackageType))
+    releases_status = relationship("CVERelease", secondary=package_release_status)
+
+
+class CVERelease(Base):
+    __tablename__ = "cve_release"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    status = Column(String)
+    status_description = Column(String)
+>>>>>>> added relationship data
