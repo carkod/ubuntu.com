@@ -181,7 +181,7 @@ app.add_url_rule(
 app.add_url_rule("/security/notices/<notice_id>", view_func=notice)
 app.add_url_rule("/security/cve", view_func=cve_index)
 app.add_url_rule(
-    "/security/<regex('cve-\\d{4}-\\d{4,7}'):cve_id>", view_func=cve
+    "/security/<regex('(cve-|CVE-)\\d{4}-\\d{4,7}'):cve_id>", view_func=cve
 )
 
 # Login
