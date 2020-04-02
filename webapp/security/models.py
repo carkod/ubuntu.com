@@ -9,7 +9,6 @@ from sqlalchemy import (
     JSON,
     String,
     Table,
-    Enum,
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -19,31 +18,6 @@ from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 # Enums
-
-
-class CveStatus(enum.Enum):
-    rejected = "rejected"
-    active = "active"
-    not_for_us = "not-for-us"  # txt file
-
-
-class PackageStatus(enum.Enum):
-    needs_triage = "needs-triage"
-    needed = "needed"
-    deferred = "deferred"
-    pending = "pending"
-    released = "released"
-    released_esm = "released-esm"
-    ignored = "ignored"
-    not_affected = "not-affected"
-    dne = "DNE"
-
-
-class PackageType(enum.Enum):
-    package = "package"
-    product = "product"
-    snap = "snap"
-
 
 notice_cves = Table(
     "notice_cves",
@@ -92,10 +66,7 @@ package_release_status = Table(
     "package_release_status",
     Base.metadata,
     Column("package_id", Integer, ForeignKey("package.id")),
-    Column("release_id", Integer, ForeignKey("release.id")),
-    Column("status", Enum(PackageStatus)),
-    Column("status_description", Enum(PackageStatus)),
-    extend_existing=True,
+    Column("release_id", Integer, ForeignKey("cve_release.id")),
 )
 
 
