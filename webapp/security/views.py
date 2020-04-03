@@ -5,7 +5,6 @@ from math import ceil
 
 # Packages
 import flask
-import os
 from feedgen.entry import FeedEntry
 from feedgen.feed import FeedGenerator
 from marshmallow import EXCLUDE
@@ -272,7 +271,6 @@ def cve_index():
 
     # Temporary fix for data to be displayed
     list_cve = db_session.query(CVE).limit(10)
-
     return flask.render_template("security/cve/index.html", list_cve=list_cve)
 
 
