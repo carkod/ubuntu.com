@@ -5,7 +5,6 @@ from math import ceil
 
 # Packages
 import flask
-import os
 from feedgen.entry import FeedEntry
 from feedgen.feed import FeedGenerator
 from marshmallow import EXCLUDE
@@ -277,11 +276,6 @@ def cve_index():
 
 
 def cve(cve_id):
-
-    # Temporary fix for data to be displayed
-    cves_query = db_session.query(CVE).first()
-    if not cves_query and os.environ["FLASK_DEBUG"] == "true":
-        create_data()
 
     cve = db_session.query(CVE).get(cve_id.upper())
     if not cve:
