@@ -264,7 +264,6 @@ def create_notice():
 # ===
 
 def cve_index():
-<<<<<<< HEAD
     """
     Display the list of CVEs, with pagination.
     Also accepts the following filtering query parameters:
@@ -282,15 +281,6 @@ def cve_index():
     limit = flask.request.args.get("limit", default=20, type=int)
     offset = flask.request.args.get("offset", default=0, type=int)
 
-    # Basic queries
-=======
-
-    page = flask.request.args.get("page", default=1, type=int)
-    order_by = flask.request.args.get("order", type=str)
-    search_id = flask.request.args.get("id", type=str)
-    search_desc = flask.request.args.get("search_desc", type=str)
-
->>>>>>> Model changes
     cves_query = db_session.query(CVE)
     releases_query = db_session.query(Release)
 
@@ -303,21 +293,7 @@ def cve_index():
 
     sort = asc if order_by == "oldest" else desc
 
-<<<<<<< HEAD
-    cves = (
-=======
-    # Search functionality
-
-    if search_id:
-        cves_query = db_session.query(CVE).get(search_id.upper())
-
-    if search_desc:
-        cves_query = cves_query.filter(
-            CVE.description.ilike(f"%{search_desc}%")
-        )
-
     list_cve = (
->>>>>>> Model changes
         cves_query.order_by(sort(CVE.public_date))
         .offset(offset)
         .limit(limit)
@@ -330,7 +306,7 @@ def cve_index():
     return flask.render_template(
         "security/cve/index.html",
         releases=releases_query.all(),
-        cves=cves,
+        cves=list_cve,
         total_results=total_results,
         total_pages=ceil(total_results / limit),
         offset=offset,
