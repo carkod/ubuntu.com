@@ -10,12 +10,21 @@ from feedgen.feed import FeedGenerator
 from marshmallow import EXCLUDE
 from marshmallow.exceptions import ValidationError
 from mistune import Markdown
-from sqlalchemy import asc, desc
+from sqlalchemy import asc, desc, exc
 from sqlalchemy.orm.exc import NoResultFound
 
 # Local
 from webapp.security.database import db_session
-from webapp.security.models import Notice, Reference, Release, CVE, Package
+from webapp.security.models import (
+    Notice,
+    Reference,
+    Release,
+    CVE,
+    Package,
+    PackageReleaseStatus,
+    CVEReference,
+    Bug
+)
 from webapp.security.schemas import NoticeSchema
 
 markdown_parser = Markdown(
@@ -334,4 +343,67 @@ def cve(cve_id):
 
 
 def api_create_cve():
-    pass
+    data = flask.request.json
+    response = flask.jsonify({"message": "Create CVE not available"}), 400
+    packages = []
+    references = []
+    bugs = []
+    if len(data["packages"]) > 0:
+        for pkg in data["packages"]:
+            releases = []
+            for rel in pkg["releases"]:
+                release = PackageReleaseStatus(
+                    name=rel["name"],
+                    status=rel["status"],
+                    status_description=rel["status_description"]
+                )
+            releases.append(release)
+            package = Package(
+                name=pkg["name"],
+                source=pkg["source"],
+                ubuntu=pkg["ubuntu"],
+                debian=pkg["debian"],
+                releases=releases
+            )
+            packages.append(package)
+
+    if len(data["references"]) > 0:
+        for ref in data["references"]:
+            reference = CVEReference(uri=ref)
+            references.append(reference)
+
+    if len(data["bugs"]) > 0:
+        for b in data["bugs"]:
+            bug = Bug(uri=b)
+            bugs.append(bug)
+
+    objects = [
+        CVE(
+            id=data["id"],
+            status=data["status"],
+            last_updated_date=data["last_updated_date"],
+            public_date_usn=data["public_date_usn"],
+            public_date=data["public_date"],
+            priority=data["priority"],
+            cvss=data["cvss"],
+            assigned_to=data["assigned_to"],
+            discovered_by=data["discovered_by"],
+            approved_by=data["approved_by"],
+            description=data["description"],
+            ubuntu_description=data["ubuntu_description"],
+            notes=data["notes"],
+            packages=packages,
+            references=references,
+            bugs=bugs
+        )
+    ]
+
+    db_session.add_all(objects)
+    try:
+        db_session.commit()
+    except exc.SQLAlchemyError:
+        response = flask.jsonify({"message": "Failed to create CVE, SQLAlchemy error"}), 200
+
+    db_session.flush()
+    response = flask.jsonify({"message": "CVE created succesfully"}), 200
+    return response
