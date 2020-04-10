@@ -161,7 +161,7 @@ def load_sample_cve():
                             name="Ubuntu 14.04 ESM (Precise Pangolin)",
                             status="DNE",
                         ),
-                        Release(
+                        PackageReleaseStatus(
                             name="Ubuntu 16.04 LTS (Xenial Xerus)",
                             status="needs-triage",
                         ),
