@@ -90,7 +90,7 @@ class CVE(Base):
     crd = Column(String)
     description = Column(String)
     ubuntu_description = Column(String)
-    notes = Column(String)
+    notes = Column(JSON)
     mitigation = Column(String)
     priority = Column(String)
     discovered_by = Column(String)
@@ -99,7 +99,10 @@ class CVE(Base):
     cvss = Column(String)  # CVSS vector to convert into Base score
     references = relationship("CVEReference", secondary=cve_references)
     bugs = relationship("Bug", secondary=cve_bugs)
-    packages = relationship("Package", secondary=cve_packages)
+    packages = relationship(
+        "Package",
+        secondary=cve_packages,
+    )
     status = Column(String)
 
 
