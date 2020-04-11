@@ -51,7 +51,7 @@ from webapp.security.views import (
     notices_feed,
     cve_index,
     cve,
-    api_create_cve
+    api_create_cve,
 )
 
 
@@ -172,9 +172,7 @@ app.add_url_rule(
     "/security/<regex('(cve-|CVE-)\\d{4}-\\d{4,7}'):cve_id>", view_func=cve
 )
 app.add_url_rule(
-    "/security",
-    view_func=api_create_cve,
-    methods=["POST", "UPDATE"]
+    "/security", view_func=api_create_cve, methods=["POST", "UPDATE"]
 )
 
 

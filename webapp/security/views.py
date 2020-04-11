@@ -23,7 +23,7 @@ from webapp.security.models import (
     Package,
     PackageReleaseStatus,
     CVEReference,
-    Bug
+    Bug,
 )
 from webapp.security.schemas import NoticeSchema
 
@@ -280,9 +280,9 @@ def cve_index():
 
     # Query parameters
     order_by = flask.request.args.get("order-by", default="oldest")
-    query = flask.request.args.get("q", default="")
-    priority = flask.request.args.get("priority", default="")
-    package = flask.request.args.get("package", default="")
+    query = flask.request.args.get("q")
+    priority = flask.request.args.get("priority")
+    package = flask.request.args.get("package")
     limit = flask.request.args.get("limit", default=20, type=int)
     offset = flask.request.args.get("offset", default=0, type=int)
 
@@ -347,11 +347,11 @@ def api_create_cve():
     Receives a POST request from load_cve.py
     Receives UPDATE request from load_cve.py
     Parses the object and bulk inserts with add_all()
-    @params json: the body of the POST request
+    @params json: the body of the request
     """
 
     data = flask.request.json
-    response = flask.jsonify({"message": "Create CVE not available"}), 400
+    response = flask.jsonify({"message": "Unable to get body"}), 400
     packages = []
     references = []
     bugs = []
@@ -372,7 +372,7 @@ def api_create_cve():
                 release = PackageReleaseStatus(
                     name=rel["name"],
                     status=rel["status"],
-                    status_description=rel["status_description"]
+                    status_description=rel["status_description"],
                 )
             releases.append(release)
             package = Package(
@@ -380,7 +380,7 @@ def api_create_cve():
                 source=pkg["source"],
                 ubuntu=pkg["ubuntu"],
                 debian=pkg["debian"],
-                releases=releases
+                releases=releases,
             )
             packages.append(package)
 
@@ -411,7 +411,7 @@ def api_create_cve():
             notes=data["notes"],
             packages=packages,
             references=references,
-            bugs=bugs
+            bugs=bugs,
         )
     ]
 
@@ -420,8 +420,47 @@ def api_create_cve():
     try:
         db_session.commit()
     except exc.SQLAlchemyError:
-        response = flask.jsonify({"message": "Failed to create CVE, SQLAlchemy error"}), 200
+        response = (
+            flask.jsonify(
+                {"message": "Failed to create CVE, SQLAlchemy error"}
+            ),
+            200,
+        )
 
     db_session.flush()
     response = flask.jsonify({"message": "CVE created succesfully"}), 200
+    return response
+
+
+def api_create_release():
+    """
+    Updates for existing releases (LTS -> ESM)
+    Creates new releases (Development=true)
+    """
+    data = flask.request.json
+    response = flask.jsonify({"message": "Unable to get body"}), 400
+
+    release = Release(
+        name=data["name"],
+        version=data["version"],
+        codename=data["codename"],
+        lts=data["lts"],
+        development=data["development"] if "development" in data else False,
+        release_date=data["release_date"]
+    )
+
+    db_session.add(release)
+
+    try:
+        db_session.commit()
+    except exc.SQLAlchemyError:
+        response = (
+            flask.jsonify(
+                {"message": "Failed to create Release, SQLAlchemy error"}
+            ),
+            200,
+        )
+
+    db_session.flush()
+    response = flask.jsonify({"message": "Release created succesfully"}), 200
     return response
