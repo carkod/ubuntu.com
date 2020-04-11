@@ -174,7 +174,7 @@ app.add_url_rule(
 app.add_url_rule(
     "/security",
     view_func=api_create_cve,
-    methods=["POST"]
+    methods=["POST", "UPDATE"]
 )
 
 

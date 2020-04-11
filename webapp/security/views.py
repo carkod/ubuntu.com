@@ -343,11 +343,28 @@ def cve(cve_id):
 
 
 def api_create_cve():
+    """
+    Receives a POST request from load_cve.py
+    Receives UPDATE request from load_cve.py
+    Parses the object and bulk inserts with add_all()
+    @params json: the body of the POST request
+    """
+
     data = flask.request.json
     response = flask.jsonify({"message": "Create CVE not available"}), 400
     packages = []
     references = []
     bugs = []
+
+    # Check if CVE exists by candidate
+    try:
+        db_session.query(CVE).filter(CVE.id == data["id"])
+    except exc.NoResultFound:
+        response = flask.jsonify({"message": "CVE already exists"}), 400
+        return response
+
+    # Packages
+    # Check if there are packages before mapping
     if len(data["packages"]) > 0:
         for pkg in data["packages"]:
             releases = []
@@ -399,6 +416,7 @@ def api_create_cve():
     ]
 
     db_session.add_all(objects)
+
     try:
         db_session.commit()
     except exc.SQLAlchemyError:
