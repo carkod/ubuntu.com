@@ -345,7 +345,6 @@ def cve(cve_id):
 def api_create_cve():
     """
     Receives a POST request from load_cve.py
-    Receives UPDATE request from load_cve.py
     Parses the object and bulk inserts with add_all()
     @params json: the body of the request
     """
@@ -432,7 +431,27 @@ def api_create_cve():
     return response
 
 
-def api_create_release():
+def delete_cve(cve_id):
+    """
+    Delete a CVE from db
+    @params string: query string with the CVE id
+    """
+    response = flask.jsonify({"message": "Unable to get body"}), 400
+
+    # Check if CVE exists
+    try:
+        cve = db_session.query(CVE).filter(CVE.id == cve_id).first()
+        db_session.delete(cve)
+        db_session.commit()
+    except exc.NoResultFound:
+        response = flask.jsonify({"message": "CVE does not exist"}), 400
+        return response
+
+    response = flask.jsonify({"message": "CVE deleted succesfully"}), 200
+    return response
+
+
+def create_release():
     """
     Updates for existing releases (LTS -> ESM)
     Creates new releases (Development=true)
@@ -446,7 +465,7 @@ def api_create_release():
         codename=data["codename"],
         lts=data["lts"],
         development=data["development"] if "development" in data else False,
-        release_date=data["release_date"]
+        release_date=data["release_date"],
     )
 
     db_session.add(release)
