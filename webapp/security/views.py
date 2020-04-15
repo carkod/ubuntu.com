@@ -349,7 +349,7 @@ def create_cve():
     @params json: the body of the request
     """
 
-    data = flask.request.json
+    data = flask.request.get_json()
     response = flask.jsonify({"message": "Unable to get body"}), 400
     packages = []
     references = []
@@ -399,7 +399,6 @@ def create_cve():
             status=data["status"],
             last_updated_date=data["last_updated_date"],
             public_date_usn=data["public_date_usn"],
-            public_date=data["public_date"],
             priority=data["priority"],
             cvss=data["cvss"],
             assigned_to=data["assigned_to"],
@@ -497,6 +496,7 @@ def update_cve():
         )
     ]
 
+    # Bulk function, add() for single
     db_session.add_all(objects)
 
     try:
