@@ -349,7 +349,7 @@ def create_cve():
     @params json: the body of the request
     """
 
-    data = flask.request.json
+    data = flask.request.get_json()
     response = flask.jsonify({"message": "Unable to get body"}), 400
     packages = []
     references = []
@@ -399,7 +399,6 @@ def create_cve():
             status=data["status"],
             last_updated_date=data["last_updated_date"],
             public_date_usn=data["public_date_usn"],
-            public_date=data["public_date"],
             priority=data["priority"],
             cvss=data["cvss"],
             assigned_to=data["assigned_to"],
@@ -497,6 +496,7 @@ def update_cve():
         )
     ]
 
+    # Bulk function, add() for single
     db_session.add_all(objects)
 
     try:
@@ -531,38 +531,4 @@ def delete_cve(cve_id):
         return response
 
     response = flask.jsonify({"message": "CVE deleted succesfully"}), 200
-    return response
-
-
-def create_release():
-    """
-    Updates for existing releases (LTS -> ESM)
-    Creates new releases (Development=true)
-    """
-    data = flask.request.json
-    response = flask.jsonify({"message": "Unable to get body"}), 400
-
-    release = Release(
-        name=data["name"],
-        version=data["version"],
-        codename=data["codename"],
-        lts=data["lts"],
-        development=data["development"] if "development" in data else False,
-        release_date=data["release_date"],
-    )
-
-    db_session.add(release)
-
-    try:
-        db_session.commit()
-    except exc.SQLAlchemyError:
-        response = (
-            flask.jsonify(
-                {"message": "Failed to create Release, SQLAlchemy error"}
-            ),
-            200,
-        )
-
-    db_session.flush()
-    response = flask.jsonify({"message": "Release created succesfully"}), 200
     return response
