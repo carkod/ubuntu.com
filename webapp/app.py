@@ -53,7 +53,7 @@ from webapp.security.views import (
     cve,
     create_cve,
     delete_cve,
-    update_cve
+    update_cve,
 )
 
 
