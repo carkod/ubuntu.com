@@ -75,7 +75,7 @@ cve_releases = Table(
     Column(
         "package_release_status_id",
         Integer,
-        ForeignKey("package_release_status.id"),
+        ForeignKey("package_release_status.id", ondelete="CASCADE"),
     ),
 )
 
