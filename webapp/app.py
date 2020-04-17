@@ -173,12 +173,21 @@ app.add_url_rule("/security/cve", view_func=cve_index)
 app.add_url_rule(
     "/security/<regex('(cve-|CVE-)\\d{4}-\\d{4,7}'):cve_id>", view_func=cve
 )
-app.add_url_rule("/security/cve", view_func=create_cve, methods=["POST"])
-app.add_url_rule("/security/cve", view_func=update_cve, methods=["PUT"])
+
 app.add_url_rule(
     "/security/<regex('(cve-|CVE-)\\d{4}-\\d{4,7}'):cve_id>",
     view_func=delete_cve,
     methods=["DELETE"],
+)
+app.add_url_rule(
+    "/security/<regex('(cve-|CVE-)\\d{4}-\\d{4,7}'):cve_id>",
+    view_func=update_cve,
+    methods=["PUT"],
+)
+app.add_url_rule(
+    "/security/<regex('(cve-|CVE-)\\d{4}-\\d{4,7}'):cve_id>",
+    view_func=create_cve,
+    methods=["POST"],
 )
 
 

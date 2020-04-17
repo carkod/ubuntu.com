@@ -342,122 +342,102 @@ def cve(cve_id):
 # ===
 
 
-def create_cve():
+def create_cve(cve_id):
     """
     Receives a POST request from load_cve.py
     Parses the object and bulk inserts with add_all()
     @params json: the body of the request
     """
 
-    data = flask.request.get_json()
-    response = flask.jsonify({"message": "Unable to get body"}), 400
+    data = flask.request.json
     packages = []
     references = []
     bugs = []
 
-    # Check if CVE exists by candidate
-    if db_session.query(CVE).filter(CVE.id == data["id"]).count() > 0:
-        response = flask.jsonify({"message": "CVE already exists"}), 400
-        return response
-
-    # Packages
     # Check if there are packages before mapping
-    if "packages" in data and len(data["packages"]) > 0:
-        for pkg in data["packages"]:
+    if data.get("packages"):
+        for package_data in data["packages"]:
             releases = []
-            for rel in pkg["releases"]:
-                release = PackageReleaseStatus(
-                    name=rel["name"],
-                    status=rel["status"],
-                    status_description=rel["status_description"],
+            for rel in package_data["releases"]:
+                releases.append(
+                    PackageReleaseStatus(
+                        name=rel["name"],
+                        status=rel["status"],
+                        status_description=rel["status_description"],
+                    )
                 )
-            releases.append(release)
-            package = Package(
-                name=pkg["name"],
-                source=pkg["source"],
-                ubuntu=pkg["ubuntu"],
-                debian=pkg["debian"],
-                releases=releases,
+            packages.append(
+                Package(
+                    name=package_data["name"],
+                    source=package_data["source"],
+                    ubuntu=package_data["ubuntu"],
+                    debian=package_data["debian"],
+                    releases=releases,
+                )
             )
-            packages.append(package)
 
-    if "references" in data and len(data["references"]) > 0:
+    if data.get("references"):
         for ref in data["references"]:
-            reference = CVEReference(uri=ref)
-            references.append(reference)
+            references.append(CVEReference(uri=ref))
 
-    if "bugs" in data and len(data["bugs"]) > 0:
+    if data.get("bugs"):
         for b in data["bugs"]:
-            bug = Bug(uri=b)
-            bugs.append(bug)
+            bugs.append(Bug(uri=b))
 
-    cves = [
-        CVE(
-            id=data["id"],
-            status=data["status"] if "status" in data else "",
-            last_updated_date=data["last_updated_date"]
-            if "last_updated_date" in data
-            else None,
-            public_date_usn=data["public_date_usn"]
-            if "public_date_usn" in data
-            else None,
-            priority=data["priority"] if "priority" in data else None,
-            cvss=data["cvss"] if "cvss" in data else "",
-            assigned_to=data["assigned_to"] if "assigned_to" in data else "",
-            discovered_by=data["discovered_by"]
-            if "discovered_by" in data
-            else "",
-            approved_by=data["approved_by"] if "approved_by" in data else "",
-            description=data["description"] if "description" in data else "",
-            ubuntu_description=data["ubuntu_description"]
-            if "ubuntu_description" in data
-            else "",
-            notes=data["notes"] if "notes" in data else "[]",
-            packages=packages,
-            references=references,
-            bugs=bugs,
-        )
-    ]
+    cves = CVE(
+        id=data["id"],
+        status=data.get("status", ""),
+        last_updated_date=data.get("last_updated_date"),
+        public_date_usn=data.get("public_date_usn"),
+        priority=data.get("priority"),
+        cvss=data.get("cvss"),
+        assigned_to=data.get("assigned_to"),
+        discovered_by=data.get("discovered_by"),
+        approved_by=data.get("approved_by"),
+        description=data.get("description"),
+        ubuntu_description=data.get("ubuntu_description"),
+        notes=data.get("notes", []),
+        packages=packages,
+        references=references,
+        bugs=bugs,
+    )
 
     try:
-        db_session.add_all(cves)
+        db_session.add(cves)
         db_session.commit()
-    except exc.SQLAlchemyError as e:
-        response = flask.jsonify({"message": e}), 400
-        return response
+    except exc.IntegrityError as error:
+        return flask.jsonify({"message": error.orig.args[0]}), 400
+    except exc.SQLAlchemyError as error:
+        return flask.jsonify({"message": error}), 400
 
-    response = flask.jsonify({"message": "CVE created succesfully"}), 200
-    return response
+    return flask.jsonify({"message": "CVE created succesfully"}), 201
 
 
-def update_cve():
+def update_cve(cve_id):
     data = flask.request.json
-    response = flask.jsonify({"message": "Unable to get body"}), 400
-    cve = db_session.query(CVE).filter(CVE.id == data["id"]).first()
+    cve = db_session.query(CVE).filter(CVE.id == cve_id).first()
 
     # Check if CVE exists by candidate
     if len(db_session.query(CVE).all()) == 0:
         response = flask.jsonify({"message": "CVE does not exist"}), 400
         return response
 
-    cve.status = data["status"]
-    cve.last_updated_date = data["last_updated_date"]
-    cve.public_date_usn = data["public_date_usn"]
-    cve.public_date = data["public_date"]
-    cve.priority = data["priority"]
-    cve.crd = data["crd"]
-    cve.cvss = data["cvss"]
-    cve.assigned_to = data["assigned_to"]
-    cve.discovered_by = data["discovered_by"]
-    cve.approved_by = data["approved_by"]
-    cve.description = data["description"]
-    cve.ubuntu_description = data["ubuntu_description"]
-    cve.notes = data["notes"]
-    cve.packages.clear()
-    cve.references.clear()
-    cve.bugs.clear()
+    cve.status = data.get("status")
+    cve.last_updated_date = data.get("last_updated_date")
+    cve.public_date_usn = data.get("public_date_usn")
+    cve.public_date = data.get("public_date")
+    cve.priority = data.get("priority")
+    cve.crd = data.get("crd")
+    cve.cvss = data.get("cvss")
+    cve.assigned_to = data.get("assigned_to")
+    cve.discovered_by = data.get("discovered_by")
+    cve.approved_by = data.get("approved_by")
+    cve.description = data.get("description")
+    cve.ubuntu_description = data.get("ubuntu_description")
+    cve.notes = data.get("notes")
 
-    if "references" in data and len(data["references"]) > 0:
+    if data.get("references"):
+        cve.references.clear()
         for uri in data["references"]:
             reference = (
                 db_session.query(CVEReference)
@@ -468,7 +448,8 @@ def update_cve():
                 reference = CVEReference(uri=uri)
             cve.references.append(reference)
 
-    if "bugs" in data and len(data["bugs"]) > 0:
+    if data.get("bugs"):
+        cve.bugs.clear()
         for b in data["bugs"]:
             bug = db_session.query(Bug).filter(Bug.uri == uri).first()
             if not bug:
@@ -477,23 +458,24 @@ def update_cve():
 
     # Packages
     # Check if there are packages before mapping
-    if len(data["packages"]) > 0:
-        for pkg in data["packages"]:
+    if data.get("packages"):
+        cve.packages.clear()
+        for package_data in data["packages"]:
             package = (
                 db_session.query(Package)
-                .filter(Package.name == pkg["name"])
+                .filter(Package.name == package_data["name"])
                 .first()
             )
             package.releases.clear()
             if not package:
                 package = Package(
-                    name="made up package",  # pkg["name"],
-                    source=pkg["source"],
-                    ubuntu=pkg["ubuntu"],
-                    debian=pkg["debian"],
+                    name=package_data["name"],
+                    source=package_data["source"],
+                    ubuntu=package_data["ubuntu"],
+                    debian=package_data["debian"],
                     releases=[],
                 )
-            for rel in pkg["releases"]:
+            for release_data in package_data["releases"]:
                 package_release_status = (
                     db_session.query(CVEReference)
                     .filter(CVEReference.uri == uri)
@@ -501,27 +483,24 @@ def update_cve():
                 )
                 if not package_release_status:
                     package_release_status = PackageReleaseStatus(
-                        name=rel["name"],
-                        status=rel["status"],
-                        status_description=rel["status_description"],
+                        name=release_data["name"],
+                        status=release_data["status"],
+                        status_description=release_data["status_description"],
                     )
 
                 package.releases.append(package_release_status)
             cve.packages.append(package)
 
     try:
-        # Bulk function, add() for single
         db_session.add(cve)
         db_session.commit()
-    except exc.SQLAlchemyError as e:
-        print(e)
-        response = (
-            flask.jsonify({"message": e}),
+    except exc.SQLAlchemyError as error:
+        return (
+            flask.jsonify({"message": error}),
             400,
         )
 
-    response = flask.jsonify({"message": "CVE updated succesfully"}), 200
-    return response
+    return flask.jsonify({"message": "CVE updated succesfully"}), 200
 
 
 def delete_cve(cve_id):
@@ -529,21 +508,16 @@ def delete_cve(cve_id):
     Delete a CVE from db
     @params string: query string with the CVE id
     """
-    response = flask.jsonify({"message": "Unable to get body"}), 400
     cve_query = db_session.query(CVE)
     cve = cve_query.filter(CVE.id == cve_id).first()
-
-    # Check if CVE exists
-    if cve_query.filter(CVE.id == cve_id).count() == 0:
-        response = flask.jsonify({"message": "CVE does not exist"}), 400
-        return response
 
     try:
         db_session.delete(cve)
         db_session.commit()
-    except exc.SQLAlchemyError as e:
-        response = flask.jsonify({"message": e}), 400
+    except exc.IntegrityError as error:
+        return flask.jsonify({"message": error.orig.args[0]}), 400
+    except exc.SQLAlchemyError as error:
+        response = flask.jsonify({"message": error}), 400
         return response
 
-    response = flask.jsonify({"message": "CVE deleted succesfully"}), 200
-    return response
+    return flask.jsonify({"message": "CVE deleted succesfully"}), 200
