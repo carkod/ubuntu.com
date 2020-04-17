@@ -536,7 +536,6 @@ def delete_cve(cve_id):
 
 def create_release():
     """
-    Updates for existing releases (LTS -> ESM)
     Creates new releases (Development=true)
     """
     data = flask.request.json
@@ -555,11 +554,52 @@ def create_release():
 
     try:
         db_session.commit()
-    except exc.SQLAlchemyError:
+    except exc.SQLAlchemyError as e:
         response = (
-            flask.jsonify(
-                {"message": "Failed to create Release, SQLAlchemy error"}
-            ),
+            flask.jsonify({"message": e}),
+            200,
+        )
+
+    db_session.flush()
+    response = flask.jsonify({"message": "Release created succesfully"}), 200
+    return response
+
+
+def update_release():
+    """
+    Updates for existing releases (LTS -> ESM)
+    """
+    data = flask.request.json
+    response = flask.jsonify({"message": "Unable to get body"}), 400
+    release_query = db_session.query(Release).filter(
+        Release.codename == data["codename"]
+    )
+
+    # Check if CVE exists by candidate
+    try:
+        db_session.query(CVE).filter(CVE.id == data["codename"])
+    except exc.NoResultFound:
+        response = flask.jsonify({"message": "CVE already exists"}), 400
+        return response
+
+    release_query.update(
+        {
+            "name": data["name"],
+            "version": data["version"],
+            "codename": data["codename"],
+            "lts": data["lts"],
+            "development": data["development"],
+            "release_date": data["release_date"],
+            "esm_expires": data["esm_expires"],
+            "support_expires": data["support_expires"],
+        }
+    )
+
+    try:
+        db_session.commit()
+    except exc.SQLAlchemyError as e:
+        response = (
+            flask.jsonify({"message": e}),
             200,
         )
 

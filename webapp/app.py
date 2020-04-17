@@ -53,6 +53,9 @@ from webapp.security.views import (
     cve,
     create_cve,
     delete_cve,
+    create_release,
+    update_release,
+    delete_release
 )
 
 
@@ -180,6 +183,15 @@ app.add_url_rule(
     methods=["DELETE"],
 )
 
+app.add_url_rule(
+    "/security/release", view_func=create_release, methods=["POST"]
+)
+app.add_url_rule(
+    "/security/release", view_func=update_release, methods=["PUT"]
+)
+app.add_url_rule(
+    "/security/release", view_func=delete_release, methods=["DELETE"]
+)
 
 # Login
 app.add_url_rule("/login", methods=["GET", "POST"], view_func=login_handler)
