@@ -384,7 +384,7 @@ def create_cve(cve_id):
         for b in data["bugs"]:
             bugs.append(Bug(uri=b))
 
-    cves = CVE(
+    cve = CVE(
         id=data["id"],
         status=data.get("status", ""),
         last_updated_date=data.get("last_updated_date"),
@@ -403,12 +403,11 @@ def create_cve(cve_id):
     )
 
     try:
-        db_session.add(cves)
+        db_session.add(cve)
         db_session.commit()
-    except exc.IntegrityError as error:
-        return flask.jsonify({"message": error.orig.args[0]}), 400
-    except exc.SQLAlchemyError as error:
-        return flask.jsonify({"message": error}), 400
+    # Duplicate key errors and Payload input errors
+    except (exc.IntegrityError, exc.DataError) as error:
+        return flask.jsonify({"message": error.orig.args[0]}), 409
 
     return flask.jsonify({"message": "CVE created succesfully"}), 201
 
@@ -445,7 +444,7 @@ def update_cve(cve_id):
                 .first()
             )
             if not reference:
-                reference = CVEReference(uri=uri)
+                reference = uri
             cve.references.append(reference)
 
     if data.get("bugs"):
@@ -460,33 +459,21 @@ def update_cve(cve_id):
     # Check if there are packages before mapping
     if data.get("packages"):
         cve.packages.clear()
-        for package_data in data["packages"]:
-            package = (
-                db_session.query(Package)
-                .filter(Package.name == package_data["name"])
-                .first()
+        for index, package_data in enumerate(data["packages"]):
+            package = Package(
+                name=package_data["name"],
+                source=package_data["source"],
+                ubuntu=package_data["ubuntu"],
+                debian=package_data["debian"],
+                releases=[],
             )
             package.releases.clear()
-            if not package:
-                package = Package(
-                    name=package_data["name"],
-                    source=package_data["source"],
-                    ubuntu=package_data["ubuntu"],
-                    debian=package_data["debian"],
-                    releases=[],
-                )
             for release_data in package_data["releases"]:
-                package_release_status = (
-                    db_session.query(CVEReference)
-                    .filter(CVEReference.uri == uri)
-                    .first()
+                package_release_status = PackageReleaseStatus(
+                    name=release_data["name"],
+                    status=release_data["status"],
+                    status_description=release_data["status_description"],
                 )
-                if not package_release_status:
-                    package_release_status = PackageReleaseStatus(
-                        name=release_data["name"],
-                        status=release_data["status"],
-                        status_description=release_data["status_description"],
-                    )
 
                 package.releases.append(package_release_status)
             cve.packages.append(package)
@@ -494,12 +481,12 @@ def update_cve(cve_id):
     try:
         db_session.add(cve)
         db_session.commit()
-    except exc.SQLAlchemyError as error:
+    # Payload input errors
+    except exc.DataError as error:
         return (
-            flask.jsonify({"message": error}),
+            flask.jsonify({"message": error.orig.args[0]}),
             400,
         )
-
     return flask.jsonify({"message": "CVE updated succesfully"}), 200
 
 
@@ -514,10 +501,8 @@ def delete_cve(cve_id):
     try:
         db_session.delete(cve)
         db_session.commit()
+
     except exc.IntegrityError as error:
         return flask.jsonify({"message": error.orig.args[0]}), 400
-    except exc.SQLAlchemyError as error:
-        response = flask.jsonify({"message": error}), 400
-        return response
 
     return flask.jsonify({"message": "CVE deleted succesfully"}), 200

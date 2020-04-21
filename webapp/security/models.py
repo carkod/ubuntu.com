@@ -99,7 +99,7 @@ class CVE(Base):
     cvss = Column(String)  # CVSS vector to convert into Base score
     references = relationship("CVEReference", secondary=cve_references)
     bugs = relationship("Bug", secondary=cve_bugs)
-    packages = relationship("Package", secondary=cve_packages,)
+    packages = relationship("Package", secondary=cve_packages)
     status = Column(String)
 
 
