@@ -12,7 +12,7 @@
     <h2>Search</h2>
   </div>
 
-  <form>
+  <form method="POST">
     <div class="row">
       <div class="col-3">
         <label for="q">CVE ID:</label>
@@ -53,6 +53,73 @@
         </div>
       </div>
     </div>
+    <div class="col-3">
+      <label for="release">release:</label>
+      <select name="release" id="release">
+        <option value="">Any</option>
+        <option value="18.04">
+          19.04
+        </option>
+        <option value="20.04">
+          20.04
+        </option>
+        <option value="16.04">
+          16.04
+        </option>
+      </select>
+    </div>
+    <div class="col-3">
+      <label for="status">status:</label>
+      <select name="status" id="status">
+        <option value="">Any</option>
+        <option value="DNE">
+          DNE
+        </option>
+        <option value="needs-triage">
+          needs-triage
+        </option>
+        <option value="not-affected">
+          not-affected
+        </option>
+        <option value="released">
+          released
+        </option>
+      </select>
+    </div>
+    <div class="col-3">
+      <label for="release1">release:</label>
+      <select name="release1" id="release1">
+        <option value="">Any</option>
+        <option value="18.04">
+          19.04
+        </option>
+        <option value="20.04">
+          20.04
+        </option>
+        <option value="16.04">
+          16.04
+        </option>
+      </select>
+    </div>
+    <div class="col-3">
+      <label for="status1">status:</label>
+      <select name="status1" id="status1">
+        <option value="">Any</option>
+        <option value="DNE">
+          DNE
+        </option>
+        <option value="needs-triage">
+          needs-triage
+        </option>
+        <option value="not-affected">
+          not-affected
+        </option>
+        <option value="released">
+          released
+        </option>
+      </select>
+    </div>
+  
   </form>
 
   <div class="u-fixed-width">

@@ -290,8 +290,11 @@ def cve_index():
     limit = flask.request.args.get("limit", default=20, type=int)
     offset = flask.request.args.get("offset", default=0, type=int)
 
+    data = flask.request.form
+
     cves_query = db_session.query(CVE)
     releases_query = db_session.query(Release)
+    release_status_query = db_session.query(PackageReleaseStatus)
 
     # Apply search filters
     if package:
