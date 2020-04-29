@@ -14,6 +14,7 @@ from mistune import Markdown
 from sqlalchemy import asc, desc, or_
 from sqlalchemy.exc import IntegrityError, DataError
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql import text
 
 # Local
 from webapp.security.database import db_session
@@ -290,12 +291,22 @@ def cve_index():
     limit = flask.request.args.get("limit", default=20, type=int)
     offset = flask.request.args.get("offset", default=0, type=int)
 
-    data = flask.request.form
+    release = 
 
     cves_query = db_session.query(CVE)
     releases_query = db_session.query(Release)
-    release_status_query = db_session.query(PackageReleaseStatus)
 
+
+    # Advanced search (Multiple package release/status pairs search)
+    query = """
+    SELECT package_release_status.name, package_release_status.status, package_release_status.status_description
+    FROM (
+        SELECT *, package_release_status.status || '-' || package_release_status.name AS pairs FROM package_release_status
+    ) WHERE pairs IN ('DNE-xenial', 'DNE-precise')
+    """
+    package_release_status_query = db_session.execute(query)
+
+    
     # Apply search filters
     if package:
         cves_query = cves_query.join(Package, CVE.packages).filter(
