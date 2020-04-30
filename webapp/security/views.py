@@ -11,10 +11,9 @@ from feedgen.feed import FeedGenerator
 from marshmallow import EXCLUDE
 from marshmallow.exceptions import ValidationError
 from mistune import Markdown
-from sqlalchemy import asc, desc, or_
+from sqlalchemy import asc, desc, or_, and_
 from sqlalchemy.exc import IntegrityError, DataError
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql import text
 
 # Local
 from webapp.security.database import db_session
@@ -290,23 +289,12 @@ def cve_index():
     package = flask.request.args.get("package")
     limit = flask.request.args.get("limit", default=20, type=int)
     offset = flask.request.args.get("offset", default=0, type=int)
-
-    release = 
+    list_ubuntu_versions = ["xenial", "precise"]
+    list_statuses = ["DNE", "DNE"]
 
     cves_query = db_session.query(CVE)
     releases_query = db_session.query(Release)
 
-
-    # Advanced search (Multiple package release/status pairs search)
-    query = """
-    SELECT package_release_status.name, package_release_status.status, package_release_status.status_description
-    FROM (
-        SELECT *, package_release_status.status || '-' || package_release_status.name AS pairs FROM package_release_status
-    ) WHERE pairs IN ('DNE-xenial', 'DNE-precise')
-    """
-    package_release_status_query = db_session.execute(query)
-
-    
     # Apply search filters
     if package:
         cves_query = cves_query.join(Package, CVE.packages).filter(
@@ -319,12 +307,25 @@ def cve_index():
     if query:
         cves_query = cves_query.filter(CVE.description.ilike(f"%{query}%"))
 
+    cves_query = (
+        db_session.query(CVE)
+        .join(CVE.packages)
+        .join(Package.releases)
+        .filter(
+            and_(
+                PackageReleaseStatus.status.in_(list_ubuntu_versions),
+                PackageReleaseStatus.name.in_(list_statuses),
+            )
+        )
+    )
+
     sort = asc if order_by == "oldest" else desc
 
     cves = (
         cves_query.order_by(sort(CVE.public_date))
         .offset(offset)
         .limit(limit)
+        .distinct()
         .all()
     )
 
