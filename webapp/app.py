@@ -296,9 +296,10 @@ engage_path = "/engage"
 engage_docs = DiscourseDocs(
     parser=DocParser(
         api=discourse_api,
-        category_id=51,
         index_topic_id=17229,
         url_prefix=engage_path,
+        api_key=API_KEY,
+        api_username=API_USERNAME
     ),
     document_template="/engage-pages/base.html",
     url_prefix=engage_path,

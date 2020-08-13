@@ -688,15 +688,15 @@ def build_engage_index(engage_docs):
                 if topic in doc["categories"]
             ]
 
-        if sort == "difficulty-desc":
-            metadata = sorted(
-                metadata, key=lambda k: k["difficulty"], reverse=True
-            )
+        # if sort == "difficulty-desc":
+        #     metadata = sorted(
+        #         metadata, key=lambda k: k["difficulty"], reverse=True
+        #     )
 
-        if sort == "difficulty-asc" or not sort:
-            metadata = sorted(
-                metadata, key=lambda k: k["difficulty"], reverse=False
-            )
+        # if sort == "difficulty-asc" or not sort:
+        #     metadata = sorted(
+        #         metadata, key=lambda k: k["difficulty"], reverse=False
+        #     )
 
         total_pages = math.ceil(len(metadata) / posts_per_page)
 
