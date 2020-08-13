@@ -68,6 +68,8 @@ from webapp.security.views import (
 CAPTCHA_TESTING_API_KEY = os.getenv(
     "CAPTCHA_TESTING_API_KEY", "6LfYBloUAAAAAINm0KzbEv6TP0boLsTEzpdrB8if"
 )
+DISCOURSE_API_KEY = os.getenv("DISCOURSE_API_KEY")
+DISCOURSE_API_USERNAME = os.getenv("DISCOURSE_API_USERNAME")
 
 # Set up application
 # ===
@@ -295,13 +297,16 @@ ceph_docs.init_app(app)
 engage_path = "/engage"
 engage_docs = DiscourseDocs(
     parser=DocParser(
-        api=discourse_api,
+        api=DiscourseAPI(
+            base_url="https://discourse.ubuntu.com/",
+            session=session,
+            api_key=DISCOURSE_API_KEY,
+            api_username=DISCOURSE_API_USERNAME,
+        ),
         index_topic_id=17229,
         url_prefix=engage_path,
-        api_key=API_KEY,
-        api_username=API_USERNAME
     ),
-    document_template="/engage-pages/base.html",
+    document_template="/engage/base.html",
     url_prefix=engage_path,
     blueprint_name="engage-pages",
 )
