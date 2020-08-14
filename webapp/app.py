@@ -15,6 +15,8 @@ from canonicalwebteam.discourse_docs import (
     DiscourseAPI,
     DiscourseDocs,
     DocParser,
+    EngageParser,
+    EngagePages
 )
 
 # Local
@@ -295,8 +297,8 @@ ceph_docs.init_app(app)
 
 # Engage pages from Discourse
 engage_path = "/engage"
-engage_docs = DiscourseDocs(
-    parser=DocParser(
+engage_docs = EngagePages(
+    parser=EngageParser(
         api=DiscourseAPI(
             base_url="https://discourse.ubuntu.com/",
             session=session,
