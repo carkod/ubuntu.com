@@ -679,30 +679,12 @@ def build_engage_index(engage_docs):
         sort = flask.request.args.get("sort", default=None, type=str)
         posts_per_page = 15
         engage_docs.parser.parse()
-        if not topic:
-            metadata = engage_docs.parser.metadata
-        else:
-            metadata = [
-                doc
-                for doc in engage_docs.parser.metadata
-                if topic in doc["categories"]
-            ]
-
-        # if sort == "difficulty-desc":
-        #     metadata = sorted(
-        #         metadata, key=lambda k: k["difficulty"], reverse=True
-        #     )
-
-        # if sort == "difficulty-asc" or not sort:
-        #     metadata = sorted(
-        #         metadata, key=lambda k: k["difficulty"], reverse=False
-        #     )
+        metadata = engage_docs.parser.metadata
 
         total_pages = math.ceil(len(metadata) / posts_per_page)
 
         return flask.render_template(
             "engage/index.html",
-            navigation=engage_docs.parser.navigation,
             forum_url=engage_docs.parser.api.base_url,
             metadata=metadata,
             page=page,
@@ -713,6 +695,7 @@ def build_engage_index(engage_docs):
         )
 
     return engage_index
+
 
 # Blog
 # ===

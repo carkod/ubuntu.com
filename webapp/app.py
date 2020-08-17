@@ -13,10 +13,10 @@ from canonicalwebteam import image_template
 from canonicalwebteam.blog import build_blueprint, BlogViews, BlogAPI
 from canonicalwebteam.discourse_docs import (
     DiscourseAPI,
-    DiscourseDocs,
+    Discourse,
     DocParser,
     EngageParser,
-    EngagePages
+    EngagePages,
 )
 
 # Local
@@ -49,7 +49,7 @@ from webapp.views import (
     releasenotes_redirect,
     search_snaps,
     notify_build,
-    build_engage_index
+    build_engage_index,
 )
 from webapp.login import login_handler, logout, user_info
 from webapp.security.database import db_session
@@ -245,7 +245,7 @@ app.add_url_rule(
 app.add_url_rule("/<path:subpath>", view_func=template_finder_view)
 
 url_prefix = "/server/docs"
-server_docs = DiscourseDocs(
+server_docs = Discourse(
     parser=DocParser(
         api=discourse_api,
         category_id=26,
@@ -268,7 +268,7 @@ app.add_url_rule(
 )
 
 tutorials_path = "/tutorials"
-tutorials_docs = DiscourseDocs(
+tutorials_docs = Discourse(
     parser=DocParser(
         api=discourse_api,
         category_id=34,
@@ -285,7 +285,7 @@ app.add_url_rule(
 tutorials_docs.init_app(app)
 
 # Ceph docs
-ceph_docs = DiscourseDocs(
+ceph_docs = Discourse(
     parser=DocParser(
         api=discourse_api, index_topic_id=17250, url_prefix="/ceph/docs",
     ),
@@ -312,10 +312,9 @@ engage_docs = EngagePages(
     url_prefix=engage_path,
     blueprint_name="engage-pages",
 )
-app.add_url_rule(
-    engage_path, view_func=build_engage_index(engage_docs)
-)
+app.add_url_rule(engage_path, view_func=build_engage_index(engage_docs))
 engage_docs.init_app(app)
+
 
 @app.after_request
 def cache_headers(response):

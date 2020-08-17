@@ -7,48 +7,66 @@
 {% block meta_description %}Extended Security Maintenance (ESM) will be available for Ubuntu 14.04 LTS Trusty Tahr for continued security and compliance of the most popular linux operating system.{% endblock %}
 {% block meta_image %}2217d1c8-Security.svg{% endblock %}
 
-{% block meta_copydoc %}https://docs.google.com/document/d/1zAv3ouUrzQcQDw2DSefaePXcMu35BAumIMpzqmIkycs/edit{% endblock meta_copydoc %}
+{% block meta_copydoc %}{document["metadata"]["meta_copydoc]}{% endblock meta_copydoc %}
 
 {% block content %}
 
-<section class="p-strip--image is-deep js-takeover is-dark p-takeover--compliance">
+<section class="p-strip--{{document['metadata']['banner_class']}}">
   <div class="u-fixed-width navigation-logo-engage">
     <a href="/">
-      {{
-        image(
-          url="https://assets.ubuntu.com/v1/f263d9c4-logo-ubuntu-white.svg",
-          alt="Ubuntu",
-          height="32",
-          width="143",
-          hi_def=True,
-          loading="auto"
-        ) | safe
-      }}
+      {% if document['metadata']['banner_class'] == 'light' %}
+        {{
+          image(
+            url="https://assets.ubuntu.com/v1/04115a7e-ubuntu_black-orange_hex.svg",
+            alt="Ubuntu",
+            height="32",
+            width="143",
+            hi_def=True,
+            loading="auto"
+          ) | safe
+        }}
+      {% else %}
+        {{
+          image(
+            url="https://assets.ubuntu.com/v1/f263d9c4-logo-ubuntu-white.svg",
+            alt="Ubuntu",
+            height="32",
+            width="143",
+            hi_def=True,
+            loading="auto"
+          ) | safe
+        }}
+      {% endif %}
+      
     </a>
   </div>
   <div class="row">
     <div class="col-7">
-      {{document["metadata"]}}
       <h1>{{document["title"]}}</h1>
       <p class="u-no-padding--top p-heading--four">Learn how to maintain ongoing security compliance for your 14.04 systems.</p>
+      {% if document["metadata"]["webinar_code"] != "" %}
       <p>
         <a href="#register-section" class="p-button--positive">
           Watch the webinar
         </a>
       </p>
+      {% endif %}
     </div>
+    {% if document["metadata"]["image"] != '' %}
     <div class="col-4 u-hide--small u-vertically-center u-align--center">
+      
       {{
         image(
-          url="https://assets.ubuntu.com/v1/2217d1c8-Security.svg",
+          url=document["metadata"]["image"],
           alt="",
-          height="154",
-          width="154",
+          height=document["metadata"]["image_height"],
+          width=document["metadata"]["image_width"],
           hi_def=True,
           loading="auto"
         ) | safe
       }}
     </div>
+    {% endif %}
   </div>
   <style>
     .p-takeover--compliance {
@@ -63,10 +81,18 @@
 
 <section class="p-strip is-shallow is-bordered">
   <div class="row">
-    <div class="col-8">
-      {{document["body_html"]}}
+    <div class="col-7">
+      {% for text in document["body_html"] %}
+      {{ text | safe }}
+      {% endfor %}
     </div>
+    {% if document["metadata"]["form_id"] != "" %}
+    <div class="col-5" id="the-form">
+      {% with id=document["metadata"]["form_id"], returnURL=document["metadata"]["resource_url"], cta="Download the case study" %}{% include "engage/shared/_en_engage_form.html" %}{% endwith %}
+    </div>
+    {% endif %}
   </div>
+  
 </section>
 
 {% endblock content %}
