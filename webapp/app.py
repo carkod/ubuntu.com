@@ -11,9 +11,9 @@ from canonicalwebteam.templatefinder import TemplateFinder
 from canonicalwebteam.search import build_search_view
 from canonicalwebteam import image_template
 from canonicalwebteam.blog import build_blueprint, BlogViews, BlogAPI
-from canonicalwebteam.discourse_docs import (
+from canonicalwebteam.discourse import (
     DiscourseAPI,
-    Discourse,
+    Docs,
     DocParser,
     EngageParser,
     EngagePages,
@@ -245,7 +245,7 @@ app.add_url_rule(
 app.add_url_rule("/<path:subpath>", view_func=template_finder_view)
 
 url_prefix = "/server/docs"
-server_docs = Discourse(
+server_docs = Docs(
     parser=DocParser(
         api=discourse_api,
         category_id=26,
@@ -268,7 +268,7 @@ app.add_url_rule(
 )
 
 tutorials_path = "/tutorials"
-tutorials_docs = Discourse(
+tutorials_docs = Docs(
     parser=DocParser(
         api=discourse_api,
         category_id=34,
@@ -285,7 +285,7 @@ app.add_url_rule(
 tutorials_docs.init_app(app)
 
 # Ceph docs
-ceph_docs = Discourse(
+ceph_docs = Docs(
     parser=DocParser(
         api=discourse_api, index_topic_id=17250, url_prefix="/ceph/docs",
     ),
@@ -295,7 +295,7 @@ ceph_docs = Discourse(
 )
 ceph_docs.init_app(app)
 
-# Engage pages from Discourse
+# Engage pages from Docs
 engage_path = "/engage"
 engage_docs = EngagePages(
     parser=EngageParser(
