@@ -697,6 +697,40 @@ def build_engage_index(engage_docs):
     return engage_index
 
 
+def engage_thank_you(engage_pages):
+    """
+    Renders an engage pages thank-you page
+    i.e. whitepapers, pdfs
+
+    If there is no current topic it can't render the page
+    e.g. accessing directly
+
+    @parameter: an EngagePages instance
+    @returns: a function that renders a template
+        - If it does not come from a topic, abort
+        - If it comes from a topic, render the page
+        with the data
+    """
+    def render_template():
+        
+        if hasattr(engage_pages.parser, "current_topic"):
+            request_url = flask.request.referrer
+            resource_name = engage_pages.parser.current_topic_metadata["type"]
+            resource_url = engage_pages.parser.current_topic["resource_url"]
+            related = engage_pages.parser.related
+            return flask.render_template(
+                "engage/thank-you.html",
+                request_url=request_url,
+                resource_name=resource_name,
+                resource_url=resource_url,
+                related=related,
+            )
+        else:
+            return flask.abort(404)
+
+    return render_template
+
+
 # Blog
 # ===
 class BlogView(flask.views.View):

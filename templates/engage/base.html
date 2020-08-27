@@ -68,34 +68,33 @@
     </div>
     {% endif %}
   </div>
-  <style>
-    .p-takeover--compliance {
-      background-image: linear-gradient(44deg, #171717 0%, #181818 9%, #262626 34%, #2D2D2D 67%, #383838 88%, #2E2E2E 100%, #393939 100%);
-    }
-    .p-compliance-icon {
-      height: 154px;
-      width: 154px;
-    }
-  </style>
 </section>
+
+
 
 <section class="p-strip is-shallow is-bordered">
   <div class="row">
-    <div class="col-7">
+    <div class="{% if document['metadata']['form_id'] != '' %}col-7{% else %}col-8{% endif %}">
       {% for text in document["body_html"] %}
       {{ text | safe }}
       {% endfor %}
     </div>
     {% if document["metadata"]["form_id"] != "" %}
     <div class="col-5" id="the-form">
-      {% with id=document["metadata"]["form_id"], returnURL=document["metadata"]["resource_url"], cta="Download the case study" %}{% include "engage/shared/_en_engage_form.html" %}{% endwith %}
+      {% if document["metadata"]["language"] != '' %}
+        {% with id=document["metadata"]["form_id"], returnURL="/engage/thank-you", cta="Download the case study" %}
+          
+            {% include "engage/shared/_en_engage_form.html" %}
+          
+        {% endwith %}
+      {% endif %}
     </div>
     {% endif %}
   </div>
   
 </section>
 
-{% if document["metadata"]["webinar_code"] %}
+{% if document["metadata"]["webinar_code"] != "" %}
 <!-- webinar -->
 <section class="p-strip is-shallow" id="register-section">
   <div class="row" id="webinar">

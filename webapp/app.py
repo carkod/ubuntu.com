@@ -50,6 +50,7 @@ from webapp.views import (
     search_snaps,
     notify_build,
     build_engage_index,
+    engage_thank_you,
 )
 from webapp.login import login_handler, logout, user_info
 from webapp.security.database import db_session
@@ -287,7 +288,9 @@ tutorials_docs.init_app(app)
 # Ceph docs
 ceph_docs = Docs(
     parser=DocParser(
-        api=discourse_api, index_topic_id=17250, url_prefix="/ceph/docs",
+        api=discourse_api,
+        index_topic_id=17250,
+        url_prefix="/ceph/docs",
     ),
     document_template="/ceph/document.html",
     url_prefix="/ceph/docs",
@@ -297,7 +300,7 @@ ceph_docs.init_app(app)
 
 # Engage pages from Docs
 engage_path = "/engage"
-engage_docs = EngagePages(
+engage_pages = EngagePages(
     parser=EngageParser(
         api=DiscourseAPI(
             base_url="https://discourse.ubuntu.com/",
@@ -312,8 +315,9 @@ engage_docs = EngagePages(
     url_prefix=engage_path,
     blueprint_name="engage-pages",
 )
-app.add_url_rule(engage_path, view_func=build_engage_index(engage_docs))
-engage_docs.init_app(app)
+app.add_url_rule(engage_path, view_func=build_engage_index(engage_pages))
+app.add_url_rule("/engage/thank-you", view_func=engage_thank_you(engage_pages))
+engage_pages.init_app(app)
 
 
 @app.after_request
