@@ -702,9 +702,6 @@ def engage_thank_you(engage_pages):
     Renders an engage pages thank-you page
     i.e. whitepapers, pdfs
 
-    If there is no current topic it can't render the page
-    e.g. accessing directly
-
     @parameter: an EngagePages instance
     @returns: a function that renders a template
         - If it does not come from a topic, abort

@@ -11,7 +11,8 @@
 
 {% block content %}
 
-<section class="p-strip--{{document['metadata']['banner_class']}}">
+{{document}}
+<section {% if header_lang %}lang="{{ header_lang }}"{% endif %} class="p-strip--{{document['metadata']['banner_class']}}">
   <div class="u-fixed-width navigation-logo-engage">
     <a href="/">
       {% if document['metadata']['banner_class'] == 'light' %}
@@ -82,10 +83,13 @@
     {% if document["metadata"]["form_id"] != "" %}
     <div class="col-5" id="the-form">
       {% if document["metadata"]["language"] != '' %}
-        {% with id=document["metadata"]["form_id"], returnURL="/engage/thank-you", cta="Download the case study" %}
-          
-            {% include "engage/shared/_en_engage_form.html" %}
-          
+        {% set form = "engage/shared/_" + document["metadata"]["language"] +"_engage_form.html" %}
+        {% with id=document['metadata']['form_id'], returnURL="/engage/thank-you" %}
+          {% include form %}          
+        {% endwith %}
+      {% else %}
+        {% with id=document['metadata']['form_id'], returnURL="/engage/thank-you" %}
+          {% include "engage/shared/_en_engage_form.html %}          
         {% endwith %}
       {% endif %}
     </div>
