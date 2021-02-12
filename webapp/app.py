@@ -13,8 +13,8 @@ from canonicalwebteam import image_template
 from canonicalwebteam.blog import build_blueprint, BlogViews, BlogAPI
 from canonicalwebteam.discourse import (
     DiscourseAPI,
-    Docs,
-    DocParser,
+    Tutorials,
+    TutorialParser,
     EngageParser,
     EngagePages,
 )
@@ -423,8 +423,8 @@ app.add_url_rule(
 app.add_url_rule("/<path:subpath>", view_func=template_finder_view)
 
 url_prefix = "/server/docs"
-server_docs = Docs(
-    parser=DocParser(
+server_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api,
         category_id=26,
         index_topic_id=11322,
@@ -446,8 +446,8 @@ app.add_url_rule(
 )
 
 tutorials_path = "/tutorials"
-tutorials_docs = Docs(
-    parser=DocParser(
+tutorials_discourse = Tutorials(
+    parser=TutorialParser(
         api=discourse_api,
         category_id=34,
         index_topic_id=13611,
@@ -455,16 +455,16 @@ tutorials_docs = Docs(
     ),
     document_template="/tutorials/tutorial.html",
     url_prefix=tutorials_path,
-    blueprint_name="tutorials",
+    blueprint_name="tutorials-docs",
 )
 app.add_url_rule(
-    tutorials_path, view_func=build_tutorials_index(tutorials_docs)
+    tutorials_path, view_func=build_tutorials_index(tutorials_discourse)
 )
-tutorials_docs.init_app(app)
+tutorials_discourse.init_app(app)
 
 # Ceph docs
-ceph_docs = Docs(
-    parser=DocParser(
+ceph_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api, index_topic_id=17250, url_prefix="/ceph/docs"
     ),
     document_template="/templates/docs/discourse.html",
@@ -485,8 +485,8 @@ app.add_url_rule(
 )
 
 # Core docs
-core_docs = Docs(
-    parser=DocParser(
+core_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api, index_topic_id=19764, url_prefix="/core/docs"
     ),
     document_template="/templates/docs/discourse.html",
@@ -495,8 +495,8 @@ core_docs = Docs(
 )
 core_docs.init_app(app)
 # Core docs - Modem Manager
-core_modem_manager_docs = Docs(
-    parser=DocParser(
+core_modem_manager_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api,
         index_topic_id=19901,
         url_prefix="/core/docs/modem-manager",
@@ -508,8 +508,8 @@ core_modem_manager_docs = Docs(
 core_modem_manager_docs.init_app(app)
 
 # Core docs - Bluetooth (bluez) docs
-core_bluetooth_docs = Docs(
-    parser=DocParser(
+core_bluetooth_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api, index_topic_id=19971, url_prefix="/core/docs/bluez"
     ),
     document_template="/templates/docs/discourse.html",
@@ -519,8 +519,8 @@ core_bluetooth_docs = Docs(
 core_bluetooth_docs.init_app(app)
 
 # Core docs - NetworkManager
-core_network_manager_docs = Docs(
-    parser=DocParser(
+core_network_manager_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api,
         index_topic_id=19917,
         url_prefix="/core/docs/networkmanager",
@@ -532,8 +532,8 @@ core_network_manager_docs = Docs(
 core_network_manager_docs.init_app(app)
 
 # Core docs - wp-supplicant
-core_wpa_supplicant_docs = Docs(
-    parser=DocParser(
+core_wpa_supplicant_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api,
         index_topic_id=19943,
         url_prefix="/core/docs/wpa-supplicant",
@@ -545,8 +545,8 @@ core_wpa_supplicant_docs = Docs(
 core_wpa_supplicant_docs.init_app(app)
 
 # Core docs - easy-openvpn
-core_easy_openvpn_docs = Docs(
-    parser=DocParser(
+core_easy_openvpn_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api,
         index_topic_id=19950,
         url_prefix="/core/docs/easy-openvpn",
@@ -558,8 +558,8 @@ core_easy_openvpn_docs = Docs(
 core_easy_openvpn_docs.init_app(app)
 
 # Core docs - wifi-ap
-core_wifi_ap_docs = Docs(
-    parser=DocParser(
+core_wifi_ap_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api,
         index_topic_id=19959,
         url_prefix="/core/docs/wifi-ap",
@@ -571,8 +571,8 @@ core_wifi_ap_docs = Docs(
 core_wifi_ap_docs.init_app(app)
 
 # Core docs - alsa-utils
-core_als_autils_docs = Docs(
-    parser=DocParser(
+core_als_autils_docs = Tutorials(
+    parser=TutorialParser(
         api=discourse_api,
         index_topic_id=19995,
         url_prefix="/core/docs/alsa-utils",

@@ -1114,7 +1114,7 @@ def accept_renewal(renewal_id):
         return flask.jsonify({"error": "authentication required"}), 401
 
 
-def build_tutorials_index(tutorials_docs):
+def build_tutorials_index(tutorials_discourse):
     def tutorials_index():
         page = flask.request.args.get("page", default=1, type=int)
         topic = flask.request.args.get("topic", default=None, type=str)
@@ -1145,13 +1145,13 @@ def build_tutorials_index(tutorials_docs):
                 query=query,
             )
 
-        tutorials_docs.parser.parse()
+        tutorials_discourse.parser.parse()
         if not topic:
-            metadata = tutorials_docs.parser.metadata
+            metadata = tutorials_discourse.parser.metadata
         else:
             metadata = [
                 doc
-                for doc in tutorials_docs.parser.metadata
+                for doc in tutorials_discourse.parser.metadata
                 if topic in doc["categories"]
             ]
 
@@ -1183,8 +1183,8 @@ def build_tutorials_index(tutorials_docs):
 
         return flask.render_template(
             "tutorials/index.html",
-            navigation=tutorials_docs.parser.navigation,
-            forum_url=tutorials_docs.parser.api.base_url,
+            navigation=tutorials_discourse.parser.navigation,
+            forum_url=tutorials_discourse.parser.api.base_url,
             metadata=metadata,
             page=page,
             topic=topic,
