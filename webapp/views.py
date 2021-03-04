@@ -15,6 +15,7 @@ import flask
 import gnupg
 import pytz
 import talisker.requests
+import talisker.requests
 import yaml
 import jinja2
 from ubuntu_release_info.data import Data
@@ -1149,6 +1150,7 @@ def build_tutorials_index(tutorials_docs):
 
         if query:
             results = get_search_results(
+                session=session,
                 api_key=search_api_key,
                 search_engine_id=search_engine_id,
                 siteSearch="ubuntu.com/tutorials",
