@@ -52,7 +52,6 @@ from webapp.shop.cube.views import (
 from webapp.views import (
     BlogCustomGroup,
     BlogCustomTopic,
-    BlogPressCentre,
     BlogSitemapIndex,
     BlogSitemapPage,
     build_tutorials_index,
@@ -495,7 +494,7 @@ app.add_url_rule(
 
 blog_views = BlogViews(
     api=BlogAPI(session=session),
-    excluded_tags=[3184, 3265, 3408, 3960],
+    excluded_tags=[3184, 3265, 3960],
     per_page=11,
 )
 app.add_url_rule(
@@ -505,10 +504,6 @@ app.add_url_rule(
 app.add_url_rule(
     "/blog/<regex('cloud-and-server|desktop|internet-of-things'):slug>",
     view_func=BlogCustomGroup.as_view("blog_group", blog_views=blog_views),
-)
-app.add_url_rule(
-    "/blog/press-centre",
-    view_func=BlogPressCentre.as_view("press_centre", blog_views=blog_views),
 )
 app.add_url_rule(
     "/blog/sitemap.xml",

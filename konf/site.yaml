@@ -386,6 +386,9 @@ production:
     if ($host != 'ubuntu.com' ) {
       rewrite ^ https://ubuntu.com$request_uri? permanent;
     }
+    if ($uri = '/blog/press-centre') {
+      rewrite ^ https://canonical.com/press-centre$request_uri? permanent;
+    }
     if ($uri = '/blog/latest-news') {
       add_header 'Access-Control-Allow-Origin' '*';
     }

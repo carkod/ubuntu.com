@@ -602,19 +602,6 @@ class BlogCustomGroup(BlogView):
         return flask.render_template(f"blog/{slug}.html", **context)
 
 
-class BlogPressCentre(BlogView):
-    def dispatch_request(self):
-        page_param = flask.request.args.get("page", default=1, type=int)
-        category_param = flask.request.args.get(
-            "category", default="", type=str
-        )
-        context = self.blog_views.get_group(
-            "canonical-announcements", page_param, category_param
-        )
-
-        return flask.render_template("blog/press-centre.html", **context)
-
-
 class BlogSitemapIndex(BlogView):
     def dispatch_request(self):
         response = session.get(
